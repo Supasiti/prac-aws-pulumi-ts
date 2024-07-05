@@ -1,0 +1,73 @@
+{
+    "root": true,
+    "globals": {
+        "module": true
+    },
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+        "prettier",
+        "@typescript-eslint"
+    ],
+    "extends": [
+        "prettier",
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "rules": {
+        "prettier/prettier": "error"
+    },
+    "overrides": [
+        // javascript
+        {
+            "files": [
+                "./**/*.js"
+            ],
+            "env": {
+                "es2022": true,
+                "node": true
+            }
+        },
+        // typescript
+        {
+            "files": [
+                "./**/*.ts"
+            ],
+            "env": {
+                "es2022": true,
+                "node": true
+            },
+            "rules": {
+                "no-console": "off",
+                "no-new": "off",
+                "no-underscore-dangle": "off",
+                "import/prefer-default-export": "off",
+                "import/extensions": "off",
+                "@typescript-eslint/no-explicit-any": "off",
+                "@typescript-eslint/no-unused-vars": "error",
+                "@typescript-eslint/consistent-type-definitions": [
+                    "error",
+                    "type"
+                ]
+            }
+        }
+    ],
+    "settings": {
+        "import/parsers": {
+            "@typescript-eslint/parser": [
+                ".ts",
+                ".tsx"
+            ]
+        },
+        "import/resolver": {
+            "node": {
+                "extensions": [
+                    ".js",
+                    ".jsx",
+                    ".ts",
+                    ".tsx"
+                ]
+            }
+        }
+    }
+}

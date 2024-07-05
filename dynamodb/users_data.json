@@ -1,0 +1,70 @@
+{
+    "pas-user-thara-user": [
+        {
+            "PutRequest": {
+                "Item": {
+                    "$pk": {
+                        "S": "1"
+                    },
+                    "$sk": {
+                        "S": "USER"
+                    },
+                    "$schema": {
+                        "S": "USER"
+                    },
+                    "$lastUpdated": {
+                        "S": "2023/02/13 12:21:20"
+                    },
+                    "$created": {
+                        "S": "2023/02/13 12:21:20"
+                    },
+                    "userID": {
+                        "N": "1"
+                    },
+                    "balance": {
+                        "N": "3251.12"
+                    },
+                    "email": {
+                        "S": "bob.builder@email.com"
+                    },
+                    "name": {
+                        "S": "Bob"
+                    }
+                }
+            }
+        },
+        {
+            "PutRequest": {
+                "Item": {
+                    "$pk": {
+                        "S": "2"
+                    },
+                    "$sk": {
+                        "S": "USER"
+                    },
+                    "$schema": {
+                        "S": "USER"
+                    },
+                    "$lastUpdated": {
+                        "S": "2023/02/13 12:21:20"
+                    },
+                    "$created": {
+                        "S": "2023/02/13 12:21:20"
+                    },
+                    "userID": {
+                        "N": "2"
+                    },
+                    "balance": {
+                        "N": "2034.53"
+                    },
+                    "email": {
+                        "S": "alice.wonderland@email.com"
+                    },
+                    "name": {
+                        "S": "Alice"
+                    }
+                }
+            }
+        }
+    ]
+}

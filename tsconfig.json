@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "outDir": "dist",
+        "target": "es2020",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "experimentalDecorators": true,
+        "pretty": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "forceConsistentCasingInFileNames": true
+    },
+    "include": [
+        "infra/**/*.ts",
+        "src/**/*.d.ts", 
+        "src/**/*.ts"
+    ],
+    "exclude": [
+        "dist", 
+        "node_modules", 
+        "src/**/*.(spec|test).ts"
+    ]
+}

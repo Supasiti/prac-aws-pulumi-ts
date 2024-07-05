@@ -1,0 +1,38 @@
+{
+    "name": "prac-aws-pulumi-ts",
+    "type": "module",
+    "scripts": {
+        "build": "npx tsc",
+        "test": "jest --coverage",
+        "test:unit": "jest",
+        "lint": "eslint --ext js,ts cdk src --fix"
+    },
+    "devDependencies": {
+        "@types/aws-lambda": "^8.10.119",
+        "@types/jest": "^29.5.4",
+        "@types/node": "^18",
+        "@typescript-eslint/eslint-plugin": "^5.59.9",
+        "@typescript-eslint/parser": "^5.59.9",
+        "eslint": "^8.42.0",
+        "eslint-config-prettier": "^9.0.0",
+        "eslint-plugin-import": "^2.27.5",
+        "eslint-plugin-prettier": "^4.2.1",
+        "jest": "^29.7.0",
+        "jest-standard-reporter": "^2.0.0",
+        "prettier": "^2.8.8",
+        "ts-jest": "^29.1.1",
+        "ts-node": "^10.9.1",
+        "typescript": "^5.0.0"
+    },
+    "dependencies": {
+        "@aws-sdk/client-dynamodb": "^3.410.0",
+        "@aws-sdk/client-sns": "^3.435.0",
+        "@aws-sdk/lib-dynamodb": "^3.410.0",
+        "@aws-sdk/util-dynamodb": "^3.410.0",
+        "@pulumi/aws": "^6.0.0",
+        "@pulumi/aws-apigateway": "^2.0.0",
+        "@pulumi/awsx": "^2.0.2",
+        "@pulumi/pulumi": "^3.113.0",
+        "pino": "^8.15.0"
+    }
+}
