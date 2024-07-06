@@ -18,16 +18,15 @@ export function createIAMPolicy(params: CreateIAMPolicyParams) {
 
   return new aws.iam.Policy(policyName, {
     name: policyName,
-    policy: resourceArn.apply((arn) =>
-      JSON.stringify({
-        statements: [
-          {
-            actions,
-            resources: [arn],
-            effect: params.effect || Effect.ALLOW,
-          },
-        ],
-      }),
-    ),
+    policy: pulumi.jsonStringify({
+      Version: '2012-10-17',
+      Statements: [
+        {
+          Action: actions,
+          Resource: resourceArn,
+          Effect: params.effect || Effect.ALLOW,
+        },
+      ],
+    }),
   });
 }
