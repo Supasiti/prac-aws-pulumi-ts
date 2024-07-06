@@ -10,26 +10,24 @@ export type CreateIAMPolicyParams = {
   actions: string[];
   effect?: Effect;
   policyName: string;
-  resourceArn: string;
+  resourceArn: pulumi.Output<string>;
 };
 
-export function createIAMPolicy(
-  params: CreateIAMPolicyParams & { service: string },
-) {
-  const { policyName, actions } = params;
-
-  const statement = aws.iam.getPolicyDocument({
-    statements: [
-      {
-        actions,
-        resources: [],
-        effect: params.effect || Effect.ALLOW,
-      },
-    ],
-  });
+export function createIAMPolicy(params: CreateIAMPolicyParams) {
+  const { policyName, actions, resourceArn } = params;
 
   return new aws.iam.Policy(policyName, {
     name: policyName,
-    policy: statement.then((s) => s.json),
+    policy: resourceArn.apply((arn) =>
+      JSON.stringify({
+        statements: [
+          {
+            actions,
+            resources: [arn],
+            effect: params.effect || Effect.ALLOW,
+          },
+        ],
+      }),
+    ),
   });
 }

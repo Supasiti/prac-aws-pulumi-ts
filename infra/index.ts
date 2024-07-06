@@ -1,5 +1,4 @@
 // import * as apigateway from '@pulumi/aws-apigateway';
-import * as aws from '@pulumi/aws';
 
 import { createTable } from './dynamodb';
 import { createIAMPolicy } from './iam';
@@ -7,19 +6,19 @@ import { createIAMPolicy } from './iam';
 const project = 'papt';
 const service = 'user';
 const rootId = `${project}-${service}-thara`;
-// const tableName = `${rootId}-user`;
+const tableName = `${rootId}-user`;
 
-const caller = aws.getCallerIdentity({});
-const accountId = caller.then((c) => c.accountId);
+const table = createTable({ tableName });
 
-console.log(accountId);
-// const table = createTable({ tableName });
+createIAMPolicy({
+  actions: ['dynamodb:GetItem', 'dynamodb:PutItem'],
+  policyName: `${rootId}-dynamodb-policy`,
+  resourceArn: table.arn,
+});
 
-// createIAMPolicy({
-//   actions: ['dynamodb:GetItem', 'dynamodb:PutItem'],
-//   policyName: `${rootId}-dynamodb-policy`,
-//   resourceArns: ],
-// });
+// create lambda
+
+// create api gateway
 
 // const api = new apigateway.RestAPI('api', {
 //   routes: [{ path: '/date', method: 'GET', eventHandler: fn }],
