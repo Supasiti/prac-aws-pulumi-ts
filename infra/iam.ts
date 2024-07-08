@@ -10,7 +10,7 @@ export type CreateIAMPolicyParams = {
   actions: string[];
   effect?: Effect;
   policyName: string;
-  resourceArn: pulumi.Output<string>;
+  resourceArn: pulumi.Output<string> | string;
 };
 
 export function createIAMPolicy(params: CreateIAMPolicyParams) {
