@@ -1,69 +1,16 @@
 import * as pulumi from '@pulumi/pulumi';
 import * as aws from '@pulumi/aws';
-import * as esbuild from 'esbuild';
-import * as fflate from 'fflate';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as rimraf from 'rimraf';
 
-function bundle(entry: string) {
-  const outdir = 'dist';
-  const zipPath = `${outdir}/lambda.zip`;
-
-  rimraf.rimrafSync(outdir);
-
-  esbuild.buildSync({
-    bundle: true,
-    minify: true,
-    sourcemap: true,
-    platform: 'node',
-    target: 'es2020',
-    format: 'esm',
-    outdir,
-    entryPoints: [entry],
-  });
-
-  const [outputFile] = fs.readdirSync(outdir);
-
-  const zipContent = fflate.zipSync({
-    'index.js': fs.readFileSync(
-      path.resolve(process.cwd(), outdir, outputFile),
-    ),
-  });
-
-  fs.writeFileSync(zipPath, zipContent);
-
-  return new pulumi.asset.FileArchive(zipPath);
-}
-
-export type NodeFunctionArgs = aws.lambda.FunctionArgs & {
-  entry: string;
-};
-
-export class NodeFunction extends aws.lambda.Function {
-  constructor(name: string, args: NodeFunctionArgs) {
-    const code = bundle(args.entry);
-
-    super(name, {
-      ...args,
-      code: code,
-      packageType: 'Zip',
-      runtime: aws.lambda.Runtime.NodeJS20dX,
-      handler: 'index.handler',
-    });
-  }
-}
-
-export type CreateNodeLambdaArgs = Partial<NodeFunctionArgs> & {
+export type CreateNodeLambdaArgs = Partial<aws.lambda.FunctionArgs> & {
   policies?: aws.iam.Policy[];
 };
 
-export function createNodeLambda(
+export function createNodeFunction(
   id: string,
   fnName: string,
   args: CreateNodeLambdaArgs,
 ) {
-  const { policies = [], ...nodeFnArgs } = args;
+  const { policies = [], ...fnArgs } = args;
   const lambdaId = `${id}-${fnName}`;
   const lambdaRole = createLambdaRole(lambdaId);
 
@@ -75,9 +22,12 @@ export function createNodeLambda(
 
   attachRolePolicies(lambdaId, lambdaRole, policies);
 
-  return new NodeFunction(lambdaId, {
-    ...nodeFnArgs,
-    entry: `../src/handlers/${fnName}.ts`,
+  return new aws.lambda.Function(lambdaId, {
+    ...fnArgs,
+    code: new pulumi.asset.FileArchive(`../dist/${fnName}.zip`),
+    packageType: 'Zip',
+    runtime: aws.lambda.Runtime.NodeJS18dX,
+    handler: 'index.handler',
     name: lambdaId,
     role: lambdaRole.arn,
   });

@@ -5,7 +5,8 @@
         "build": "npx tsc",
         "test": "jest --coverage",
         "test:unit": "jest",
-        "lint": "eslint --ext js,ts cdk src --fix"
+        "lint": "eslint --ext js,ts src scripts infra --fix",
+        "bundle": "ts-node-esm scripts/bundle.ts"
     },
     "devDependencies": {
         "@types/aws-lambda": "^8.10.119",

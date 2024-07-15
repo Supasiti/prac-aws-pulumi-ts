@@ -1,14 +1,14 @@
-// import * as apigatewday from '@pulumi/aws-apigateway';
 import * as pulumi from '@pulumi/pulumi';
 import * as aws from '@pulumi/aws';
 
 import { createTable } from './dynamodb';
 import { createIAMPolicy } from './iam';
-import { createNodeLambda } from './lambda';
-import { routeApi } from './apigwIntegration';
+import { createNodeFunction } from './lambda';
+import { createEndpoint } from './apigwIntegration';
 
 const awsConfig = new pulumi.Config('aws');
 const awsRegion = awsConfig.require('region');
+const stack = pulumi.getStack();
 
 const project = 'papt';
 const service = 'user';
@@ -23,9 +23,21 @@ const tablePolicy = createIAMPolicy({
   resourceArn: table.arn,
 });
 
-// create lambda
-const getUserLambda = createNodeLambda(rootId, 'getUser', {
+// create getUser lambda
+const getUserLambda = createNodeFunction(rootId, 'getUser', {
   description: 'get user details by id',
+  environment: {
+    variables: {
+      USER_TABLE_NAME: userTableName,
+      REGION: awsRegion,
+    },
+  },
+  policies: [tablePolicy],
+});
+
+// create createUser lambda
+const createUserLambda = createNodeFunction(rootId, 'createUser', {
+  description: 'create new user',
   environment: {
     variables: {
       USER_TABLE_NAME: userTableName,
@@ -40,7 +52,7 @@ const apigw = new aws.apigatewayv2.Api(`${rootId}-api`, {
   protocolType: 'HTTP',
 });
 
-routeApi(rootId, {
+const getUserRoute = createEndpoint(rootId, {
   name: 'getUser',
   apigw,
   lambda: getUserLambda,
@@ -48,5 +60,36 @@ routeApi(rootId, {
   key: '/users/{userID}',
 });
 
+const createUserRoute = createEndpoint(rootId, {
+  name: 'createUser',
+  apigw,
+  lambda: createUserLambda,
+  method: 'POST',
+  key: '/users',
+});
+
+// create stage
+const stage = new aws.apigatewayv2.Stage(
+  `${rootId}-apiStage`,
+  {
+    apiId: apigw.id,
+    name: stack,
+    routeSettings: [
+      {
+        routeKey: getUserRoute.routeKey,
+        throttlingBurstLimit: 5000,
+        throttlingRateLimit: 10000,
+      },
+      {
+        routeKey: createUserRoute.routeKey,
+        throttlingBurstLimit: 5000,
+        throttlingRateLimit: 10000,
+      },
+    ],
+    autoDeploy: true,
+  },
+  { dependsOn: [getUserRoute, createUserRoute] },
+);
+
 // The URL at which the REST API will be served.
-export const url = apigw.apiEndpoint;
+export const url = pulumi.interpolate`${apigw.apiEndpoint}/${stage.name}`;

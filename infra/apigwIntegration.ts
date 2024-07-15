@@ -1,16 +1,15 @@
 import * as aws from '@pulumi/aws';
 import * as pulumi from '@pulumi/pulumi';
-import { NodeFunction } from './lambda';
 
 export type RouteApiArgs = {
   apigw: aws.apigatewayv2.Api;
-  lambda: NodeFunction;
+  lambda: aws.lambda.Function;
   method: string;
   key: string;
   name: string;
 };
 
-export function routeApi(id: string, args: RouteApiArgs) {
+export function createEndpoint(id: string, args: RouteApiArgs) {
   const { apigw, lambda, method, key, name } = args;
   const intName = `${id}-${name}`;
 
@@ -29,11 +28,10 @@ export function routeApi(id: string, args: RouteApiArgs) {
       integrationUri: lambda.arn,
       integrationMethod: method,
       payloadFormatVersion: '2.0',
-      requestTemplates: { 'application/json': '{ "statusCode": "200" }' },
     },
   );
 
-  new aws.apigatewayv2.Route(`${intName}-route`, {
+  return new aws.apigatewayv2.Route(`${intName}-route`, {
     apiId: apigw.id,
     routeKey: `${method} ${key}`,
     target: pulumi.interpolate`integrations/${integration.id}`,
