@@ -1,21 +1,19 @@
 import * as pulumi from '@pulumi/pulumi';
 import * as aws from '@pulumi/aws';
 
-import { createTable } from './dynamodb';
+import { rootId } from '../constant';
 import { createIAMPolicy } from './iam';
 import { createNodeFunction } from './lambda';
 import { createEndpoint } from './apigwIntegration';
 
 const awsConfig = new pulumi.Config('aws');
 const awsRegion = awsConfig.require('region');
-const stack = pulumi.getStack();
+const env = pulumi.getStack();
 
-const project = 'papt';
-const service = 'user';
-const rootId = `${project}-${service}-thara`;
-const userTableName = `${rootId}-user`;
-
-const table = createTable({ tableName: userTableName });
+const resources = new pulumi.StackReference(
+  `Supasiti/prac-aws-pulumi-thara-resources/${env}`,
+);
+const table = resources.getOutput('table') as pulumi.Output<aws.dynamodb.Table>;
 
 const tablePolicy = createIAMPolicy({
   actions: ['dynamodb:GetItem', 'dynamodb:PutItem'],
@@ -28,7 +26,7 @@ const getUserLambda = createNodeFunction(rootId, 'getUser', {
   description: 'get user details by id',
   environment: {
     variables: {
-      USER_TABLE_NAME: userTableName,
+      USER_TABLE_NAME: table.name,
       REGION: awsRegion,
     },
   },
@@ -40,7 +38,7 @@ const createUserLambda = createNodeFunction(rootId, 'createUser', {
   description: 'create new user',
   environment: {
     variables: {
-      USER_TABLE_NAME: userTableName,
+      USER_TABLE_NAME: table.name,
       REGION: awsRegion,
     },
   },
@@ -73,7 +71,7 @@ const stage = new aws.apigatewayv2.Stage(
   `${rootId}-apiStage`,
   {
     apiId: apigw.id,
-    name: stack,
+    name: env,
     routeSettings: [
       {
         routeKey: getUserRoute.routeKey,

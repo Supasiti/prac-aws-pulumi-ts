@@ -24,7 +24,7 @@ export function createNodeFunction(
 
   return new aws.lambda.Function(lambdaId, {
     ...fnArgs,
-    code: new pulumi.asset.FileArchive(`../dist/${fnName}.zip`),
+    code: new pulumi.asset.FileArchive(`../../dist/${fnName}.zip`),
     packageType: 'Zip',
     runtime: aws.lambda.Runtime.NodeJS18dX,
     handler: 'index.handler',
