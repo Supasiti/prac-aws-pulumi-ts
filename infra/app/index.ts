@@ -1,10 +1,19 @@
 import * as pulumi from '@pulumi/pulumi';
 import * as aws from '@pulumi/aws';
 
-import { rootId } from '../constant';
+import { rootId, config } from '../constant';
 import { createIAMPolicy } from './iam';
 import { createNodeFunction } from './lambda';
 import { createEndpoint } from './apigwIntegration';
+
+import { build } from '../../scripts/bundler';
+
+// bundle everything first
+console.log('Bundling all handlers...');
+build(config);
+
+// deploy to AWS
+console.log('Deploying to AWS...');
 
 const awsConfig = new pulumi.Config('aws');
 const awsRegion = awsConfig.require('region');
