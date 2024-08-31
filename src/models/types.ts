@@ -1,8 +1,8 @@
-export type User = {
+export type CreateUserParams = {
   name: string;
   email: string;
   balance: number;
-  userID: number;
+  userID?: number;
 };
 
-export type CreateUserParams = Omit<User, 'userID'>;
+export type User = Required<CreateUserParams>;

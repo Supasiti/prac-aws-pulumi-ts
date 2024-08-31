@@ -45,12 +45,13 @@ export async function createUser(params: CreateUserParams, _deps?: DaoDeps) {
   log.info(params, 'createUser: params');
 
   // istanbul ignore next
-  const { dbClient = getDocumentClient() } = _deps || {};
+  const { dbClient = getDocumentClient(), tableName = TABLE_NAME } =
+    _deps || {};
 
-  const userID = Date.now();
+  const userID = params.userID ?? Date.now();
   const lastUpdated = new Date().toISOString();
   const putCmd = new PutCommand({
-    TableName: TABLE_NAME,
+    TableName: tableName,
     Item: {
       ...toGetUserKey(userID),
       $schema: USER_SCHEMA,

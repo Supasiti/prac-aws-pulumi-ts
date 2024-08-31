@@ -12,7 +12,8 @@ export type DbBase = {
 export type DbUser = DbBase & User;
 
 export type DaoDeps = {
-  dbClient: DynamoDBDocumentClient;
+  dbClient?: DynamoDBDocumentClient;
+  tableName?: string;
 };
 
 export type UserDao = {
